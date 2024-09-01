@@ -35,9 +35,9 @@ public class DatabaseModel {
             query = new StringBuilder();
         }
         if (query.toString().contains("WHERE")) {
-            query.append(" AND ").append(column).append(" = ?");
+            query.append(" AND ").append(column).append(" = ? ");
         } else {
-            query.append(" WHERE ").append(column).append(" = ?");
+            query.append(" WHERE ").append(column).append(" = ? ");
         }
         parameters.add(value);
         return this;
@@ -78,19 +78,16 @@ public class DatabaseModel {
             StringBuilder columns = new StringBuilder();
             StringBuilder placeholders = new StringBuilder();
             Object[] values = new Object[columnValues.size()];
-
             int i = 0;
             for (Map.Entry<String, Object> entry : columnValues.entrySet()) {
                 columns.append(entry.getKey());
                 placeholders.append("?");
                 values[i++] = entry.getValue();
-
                 if (i < columnValues.size()) {
                     columns.append(", ");
                     placeholders.append(", ");
                 }
             }
-
             String query = "INSERT INTO " + tableName + " (" + columns.toString() + ") VALUES (" + placeholders.toString() + ")";
             return db.insertQuery(query, values);
         } finally {
@@ -127,12 +124,37 @@ public class DatabaseModel {
             db.close();
         }
     }
+    
+    // Execute an update query using key:value pairs with HashMap
+    public int update(HashMap<String, Object> columnValues) {
+        db.connect();
+        try {
+            StringBuilder setClause = new StringBuilder();
+            Object[] values = new Object[columnValues.size() + parameters.size()];
+            int i = 0;
+            for (Map.Entry<String, Object> entry : columnValues.entrySet()) {
+                setClause.append(entry.getKey()).append(" = ?");
+                values[i++] = entry.getValue();
+                if (i < columnValues.size()) {
+                    setClause.append(", ");
+                }
+            }
+            for (int j = 0; j < parameters.size(); j++) {
+                values[i++] = parameters.get(j);
+            }
+            String query = "UPDATE " + tableName + " SET " + setClause.toString() + this.query.toString();
+            return db.insertQuery(query, values);
+        } finally {
+            db.close();
+        }
+    }
 
     // Fetch all records
     public Object[][] getAll() {
         db.connect();
         try {
             String finalQuery = query.toString();
+            System.out.println(finalQuery);
             return db.getQuery(finalQuery, parameters.toArray());
         } finally {
             db.close();

@@ -1,7 +1,6 @@
 package healthy_gram;
 
 import java.awt.Color;
-import java.awt.EventQueue;
 import java.awt.Font;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -14,9 +13,15 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.border.LineBorder;
 import javax.swing.border.MatteBorder;
+
+import healthy_gram.controllers.UserController;
+import healthy_gram.helpers.UsernameOrPasswordTooShortException;
+
 import java.awt.Insets;
 import javax.swing.UIManager;
 import java.awt.Toolkit;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class Login extends JFrame {
 
@@ -92,21 +97,31 @@ public class Login extends JFrame {
 
         // Log In button
         JButton btnProceed = new JButton("Log In");
-        btnProceed.setFont(new Font("Bodoni MT Condensed", Font.BOLD, 24));
-        btnProceed.setBounds(20, 298, 327, 40);
-        btnProceed.setBackground(new Color(85, 136, 59));  
-        btnProceed.setForeground(Color.WHITE);
-        btnProceed.setBorder(BorderFactory.createLineBorder(new Color(85, 136, 59), 1));  
-        contentPane.add(btnProceed);
-
+        btnProceed.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		submit(new UserController());
+        	}
+        });
         // Create New Account button
         JButton btnCreateNew = new JButton("Create New Account");
+        btnCreateNew.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		register(new UserController());
+        	}
+        });
+        
         btnCreateNew.setFont(new Font("Bodoni MT Condensed", Font.BOLD, 24));
         btnCreateNew.setBounds(20, 348, 327, 40);
         btnCreateNew.setBackground(new Color(194, 230, 154));  
         btnCreateNew.setForeground(new Color(85, 136, 59));  
         btnCreateNew.setBorder(BorderFactory.createLineBorder(new Color(85, 136, 59), 1));  
         contentPane.add(btnCreateNew);
+        btnProceed.setFont(new Font("Bodoni MT Condensed", Font.BOLD, 24));
+        btnProceed.setBounds(20, 298, 327, 40);
+        btnProceed.setBackground(new Color(85, 136, 59));  
+        btnProceed.setForeground(Color.WHITE);
+        btnProceed.setBorder(BorderFactory.createLineBorder(new Color(85, 136, 59), 1));  
+        contentPane.add(btnProceed);
         
         JLabel lblNewLabel_1_1 = new JLabel("WELCOME");
         lblNewLabel_1_1.setHorizontalAlignment(SwingConstants.CENTER);
@@ -115,17 +130,53 @@ public class Login extends JFrame {
         lblNewLabel_1_1.setBounds(10, 45, 337, 30);
         contentPane.add(lblNewLabel_1_1);
     }
-
-    public static void main(String[] args) {
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    Login frame = new Login();
-                    frame.setVisible(true);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+    
+    public void confirmLength(String usernameInput, String passwordInput) throws UsernameOrPasswordTooShortException {
+    	if(usernameInput.length() < 8) {
+    		throw new UsernameOrPasswordTooShortException("You username can't be shorter than 8 characters!");
+    	}
+    	if(passwordInput.length() < 8) {
+    		throw new UsernameOrPasswordTooShortException("You password can't be shorter than 8 characters!");
+    	}
+    }
+    
+    @SuppressWarnings("deprecation")
+	public void submit(UserController user) {
+    	user.setUsername(textUsername.getText());
+    	user.setPasscode(textPassword.getText());
+    	try {
+			confirmLength(textUsername.getText(), textPassword.getText());
+    		if(user.verifyUser(user.getUsername(), user.getPasscode())) {
+    			PointOfSale pos = new PointOfSale();
+    			pos.setVisible(true);
+    			dispose();
+    		} else {
+    			System.out.println("Credentials didn't match in the database!");
+    		}
+    	} catch(Exception e) {
+			System.out.println(e.getMessage());
+    	} finally {
+    		textUsername.setText("");
+    		textPassword.setText("");
+    	}
+    }
+    
+    @SuppressWarnings("deprecation")
+    public void register(UserController user) {
+    	user.setUsername(textUsername.getText());
+    	user.setPasscode(textPassword.getText());
+    	try {
+			confirmLength(textUsername.getText(), textPassword.getText());
+    		if(user.newUser(user.getUsername(), user.getPasscode(), "0931231232", "Male", true)) {
+    			System.out.println("Registered Successfully!");
+    		} else {
+    			System.out.println("Something have gone wrong.");
+    		}
+    	} catch(Exception e) {
+			System.out.println(e.getMessage());
+    	} finally {
+    		textUsername.setText("");
+    		textPassword.setText("");
+    	}
     }
 }

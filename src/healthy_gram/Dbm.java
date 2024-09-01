@@ -31,7 +31,7 @@ public class Dbm {
         try {
             PreparedStatement pstmt = con.prepareStatement(query);
             for (int i = 0; i < parameters.length; i++) {
-                pstmt.setObject(i + 1, parameters[i]);
+                pstmt.setObject(i + 1, (String) parameters[i]);
             }
             rs = pstmt.executeQuery();
             ResultSetMetaData metaData = rs.getMetaData();
@@ -45,6 +45,7 @@ public class Dbm {
             }
         } catch (Exception e) {
             System.err.println("Failed to execute and process the query");
+            System.err.println("Query: " + query + parameters);
             e.printStackTrace();
         } finally {
             try {
