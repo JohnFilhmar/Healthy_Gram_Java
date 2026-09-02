@@ -1,0 +1,26 @@
+# Compiled output
+bin/
+*.class
+
+# Build tool output, if one is ever added
+target/
+build/
+out/
+
+# Dependencies vendored into the repo
+*.jar
+
+# IDE and editor
+.idea/
+*.iml
+*.swp
+.vscode/
+
+# OS
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+
+# Logs
+*.log
